@@ -20,8 +20,3 @@ x3 = 12:16
 x = c(x1,x2,x3)
 
 print(matrix(x,nrow=3))
-
-
-y = cbind(x1,x2,x3)
-
-print(y)
