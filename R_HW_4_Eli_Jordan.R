@@ -12,7 +12,7 @@ if(!require("quantmod")){
 library(quantmod)
 
 # change to TRUE to make CSV file of SPY data
-writeToCSV <- FALSE
+writeToCSV <- TRUE
 
 # Get SPY daily data for past 5 years
 getSymbols("SPY", src = "yahoo", from = Sys.Date() - 5*365, to = Sys.Date())
@@ -42,6 +42,7 @@ names(spy_returns) <- "spy_ret"
 if(writeToCSV){
   # Convert the data to a data frame and write to a CSV file
   write.csv(as.data.frame(spy_returns), file = "SPY_data.csv")
+  write.csv(as.data.frame(wmt_returns), file = "WMT_data.csv")
 }
 
 # Get WMT data from Yahoo Finance for the last 5 years
@@ -58,10 +59,10 @@ WMT_monthly <- to.monthly(WMT,indexAt = "lastof", OHLC = TRUE)
 head(WMT_monthly)
 # get monthly adjusted data
 wmt_monthly_adj <- to.monthly(WMT[,"WMT.Adjusted"], indexAt = "lastof", OHLC = FALSE)
-head(WMT_monthly_adj)
+head(wmt_monthly_adj)
 
 # Calculate monthly returns
-wmt_returns <- diff(WMT_monthly_adj) / lag(WMT_monthly_adj, k = 1)
+wmt_returns <- diff(wmt_monthly_adj) / lag(wmt_monthly_adj, k = 1)
 head(wmt_returns)
 
 # Alternatively, using quantmod's Delt function
@@ -75,8 +76,10 @@ names(wmt_returns) <- "wmt_ret"
 
 # normal mostly, around 0.025
 hist(wmt_returns$wmt_ret, main="Histogram of WMT Returns. 8 Breaks",breaks=8)
-# Incredibly normal around 0
+abline(v=mean(wmt_returns$wmt_ret,na.rm=TRUE),col='red',lty=2)
+# normal around 0
 hist(spy_returns$spy_ret,main="Histogram of SPY Returns. 8 Breaks",breaks=8)
+abline(v=mean(spy_returns$spy_ret,na.rm=TRUE),col='red',lty=2)
 # I could comment on how these graphs have relatively skinny tails (1 occurence of >2sd) but 
 # the sample size isn't large enough to draw an absolute conclusion especially since 
 # stock returns ~should~ have pretty fat tails (leptokurtic) around +- 3sd. However this data does not support
@@ -86,3 +89,27 @@ hist(spy_returns$spy_ret,main="Histogram of SPY Returns. 8 Breaks",breaks=8)
 # 50 breaks was almost too much granularity, hard to see dist shape
 hist(wmt_returns$wmt_ret,breaks=20, main = "WMT Returns 20 breaks")
 hist(spy_returns$spy_ret,breaks=20,main = "WMT Returns 20 breaks")
+
+# create logical vector of no jumps
+find_jumps_wmt = abs(wmt_returns$wmt_ret) < 0.03
+# create new vector of no jumps
+no_jumps_wmt = wmt_returns$wmt_ret[find_jumps_wmt]
+# plot
+hist(no_jumps_wmt,breaks=10)
+
+# create logical vector of no jumps
+find_jumps_spy = abs(spy_returns$spy_ret) < 0.03
+# create new vector of no jumps
+no_jumps_spy = spy_returns$spy_ret[find_jumps_spy]
+# plot
+hist(no_jumps_spy,breaks=10)
+
+#5th percentile returns for walmart
+quantile(wmt_returns$wmt_ret,probs=0.05,na.rm=TRUE) # - 0.06 = -6%
+#5th percentile returns for spy
+quantile(spy_returns$spy_ret,probs=0.05,na.rm=TRUE) # -0.058 = -5.8%
+
+# These answers make sense as the lowest 5% of returns are around -20% - 0% so this quantile should be negative.
+quantile(spy_returns_monthly, probs=0.05, na.rm=TRUE)
+quantile(wmt_returns_monthly, probs=0.05, na.rm=TRUE)
+# Same answers for monthly returns, this makes sense as the monthly returns are aggregate across days.
