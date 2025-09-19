@@ -39,8 +39,6 @@ spy_returns <- as.data.frame(spy_returns)
 
 names(spy_returns) <- "spy_ret"
 
-
-
 # Get WMT data from Yahoo Finance for the last 5 years
 getSymbols("WMT", src = "yahoo", from = Sys.Date() - 5*365, to = Sys.Date())
 
@@ -69,7 +67,7 @@ head(wmt_returns)
 wmt_returns <- as.data.frame(wmt_returns)
 
 names(wmt_returns) <- "wmt_ret"
-
+# Create CSV file with returns
 if(writeToCSV){
   # Convert the data to a data frame and write to a CSV file
   write.csv(as.data.frame(spy_returns), file = "SPY_data.csv")
@@ -77,10 +75,12 @@ if(writeToCSV){
 }
 # normal mostly, around 0.025
 hist(wmt_returns$wmt_ret, main="Histogram of WMT Returns. 8 Breaks",breaks=8)
-abline(v=mean(wmt_returns$wmt_ret,na.rm=TRUE),col='red',lty=2)
+wmt_mean = mean(wmt_returns$wmt_ret,na.rm=TRUE)
+abline(v=wmt_mean,col='red',lty=2)
 # normal around 0
 hist(spy_returns$spy_ret,main="Histogram of SPY Returns. 8 Breaks",breaks=8)
-abline(v=mean(spy_returns$spy_ret,na.rm=TRUE),col='red',lty=2)
+spy_mean = mean(spy_returns$spy_ret,na.rm=TRUE)
+abline(v=spy_mean,col='red',lty=2)
 # I could comment on how these graphs have relatively skinny tails (1 occurence of >2sd) but 
 # the sample size isn't large enough to draw an absolute conclusion especially since 
 # stock returns ~should~ have pretty fat tails (leptokurtic) around +- 3sd. However this data does not support
@@ -114,3 +114,52 @@ quantile(spy_returns$spy_ret,probs=0.05,na.rm=TRUE) # -0.058 = -5.8%
 quantile(spy_returns_monthly, probs=0.05, na.rm=TRUE)
 quantile(wmt_returns_monthly, probs=0.05, na.rm=TRUE)
 # Same answers for monthly returns, this makes sense as the monthly returns are aggregate across days.
+
+set.seed(42)
+
+# First, calculate the standard deviation for WMT returns
+wmt_sd <- sd(wmt_returns$wmt_ret, na.rm = TRUE)
+
+# Plot the histogram with the y-axis as density
+hist(wmt_returns$wmt_ret,
+     breaks = 10,
+     probability = TRUE,
+     main = "Histogram of WMT Returns with Normal Curve",
+     xlab = "Monthly Returns",
+     ylab = "Density",
+     col = "lightblue")
+
+# Use the curve() function for a simpler way to add the normal distribution line
+curve(dnorm(x, mean = wmt_mean, sd = wmt_sd),
+      col = "red",
+      lwd = 2,
+      add = TRUE)
+
+# Add a legend to make the plot easier to understand
+legend("topright", legend = "Normal Curve", col = "red", lwd = 2, bty = "n")
+
+# From the plot, we can see that the normal distribution for $WMT approximates the actual
+# returns pretty well.
+
+spy_sd <- sd(spy_returns$spy_ret, na.rm = TRUE)
+
+# Plot the histogram with the y-axis as density
+hist(spy_returns$spy_ret,
+     breaks = 10,
+     probability = TRUE,
+     main = "Histogram of SPY Returns with Normal Curve",
+     xlab = "Monthly Returns",
+     ylab = "Density",
+     col = "lightblue")
+
+# Use the curve() function for a simpler way to add the normal distribution line
+curve(dnorm(x, mean = spy_mean, sd = spy_sd),
+      col = "red",
+      lwd = 2,
+      add = TRUE)
+
+# Add a legend to make the plot easier to understand
+legend("topright", legend = "Normal Curve", col = "blue", lwd = 2, bty = "n")
+
+# However for SPY, the normal distribution appears to miss the tails of 
+# the actual returns. 
