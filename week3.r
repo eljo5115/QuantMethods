@@ -17,4 +17,8 @@ for(i in -3:3){
   abline(v=mu+i*sigma)
 }
 
-pnorm(z_grade, lower.tail = TRUE)
+pnorm(grade, mean=mu, sd=sigma, lower.tail = TRUE)
+qnorm(0.9, mean=mu, sd=sigma, lower.tail=TRUE)
+
+pnorm(-25.2, mean=5, sd=10)
+qnorm(0.01, mean=5, sd=10)

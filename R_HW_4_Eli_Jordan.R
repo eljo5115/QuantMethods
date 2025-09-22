@@ -39,11 +39,7 @@ spy_returns <- as.data.frame(spy_returns)
 
 names(spy_returns) <- "spy_ret"
 
-if(writeToCSV){
-  # Convert the data to a data frame and write to a CSV file
-  write.csv(as.data.frame(spy_returns), file = "SPY_data.csv")
-  write.csv(as.data.frame(wmt_returns), file = "WMT_data.csv")
-}
+
 
 # Get WMT data from Yahoo Finance for the last 5 years
 getSymbols("WMT", src = "yahoo", from = Sys.Date() - 5*365, to = Sys.Date())
@@ -74,6 +70,11 @@ wmt_returns <- as.data.frame(wmt_returns)
 
 names(wmt_returns) <- "wmt_ret"
 
+if(writeToCSV){
+  # Convert the data to a data frame and write to a CSV file
+  write.csv(as.data.frame(spy_returns), file = "SPY_data.csv")
+  write.csv(as.data.frame(wmt_returns), file = "WMT_data.csv")
+}
 # normal mostly, around 0.025
 hist(wmt_returns$wmt_ret, main="Histogram of WMT Returns. 8 Breaks",breaks=8)
 abline(v=mean(wmt_returns$wmt_ret,na.rm=TRUE),col='red',lty=2)
