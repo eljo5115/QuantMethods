@@ -12,7 +12,9 @@ area <- ames$Gr.Liv.Area
 price <- ames$SalePrice
 
 
-# ------------------------- Exercise 1 ---------------------------
+# Exercise 1:
+# Both of these histograms are very skewed left. Not a lot of room on the left side of the mean
+# Not a very symmetric distribution as a result (no negative prices or areas). 
 summary(area)
 hist(area)
 # Area histogram looks skewed left, the mean is ~1499 with a max 5642
