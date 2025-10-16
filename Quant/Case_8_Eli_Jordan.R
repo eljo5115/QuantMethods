@@ -50,23 +50,33 @@ sp500$gross_ret <- sp500$GSPC.Adjusted/sp500$GSPC.Adjusted[1]
 mrna$gross_ret <- mrna$MRNA.Adjusted/mrna$MRNA.Adjusted[1]
 nflx$gross_ret <- nflx$NFLX.Adjusted/nflx$NFLX.Adjusted[1]
 
-plot(gross_ret~as.Date(row.names(djia)),data=djia,type='l',main="Gross Returns",xlab="Date",ylab="Gross Return",ylim=c(0,25))
-lines(gross_ret~as.Date(row.names(sp500)),data=sp500,type='l',col="red")
-lines(gross_ret~as.Date(row.names(mrna)),data=mrna,type='l',col="green")
-lines(gross_ret~as.Date(row.names(nflx)),data=nflx,type='l',col="blue")
+plot(log(gross_ret)~as.Date(row.names(djia)),data=djia,type='l',main="Gross Returns",xlab="Date",ylab="Log Gross Returns",ylim=c(0,5),las=1)
+lines(log(gross_ret)~as.Date(row.names(sp500)),data=sp500,type='l',col="red")
+lines(log(gross_ret)~as.Date(row.names(mrna)),data=mrna,type='l',col="green")
+lines(log(gross_ret)~as.Date(row.names(nflx)),data=nflx,type='l',col="blue")
 legend("bottomright", legend = c("DJIA", "SP500","MRNA","NFLX"), col=c("black","red","green","blue"), 
 lty=c("solid","dashed","dashed","dashed"), bty="n")
 
-# daily VaR
-quantile(dji_daily_returns,probs=0.01,na.rm=TRUE)
-quantile(sp500_daily_returns,probs=0.01,na.rm=TRUE)
-quantile(mrna_daily_returns,probs=0.01,na.rm=TRUE)
-quantile(nflx_daily_returns,probs=0.01,na.rm=TRUE)
+# daily VaR at 1%
+quantile(dji_daily_returns,probs=0.01,na.rm=TRUE) #-3.56%
+quantile(sp500_daily_returns,probs=0.01,na.rm=TRUE) # -3.59%
+quantile(mrna_daily_returns,probs=0.01,na.rm=TRUE)# -11.2%
+quantile(nflx_daily_returns,probs=0.01,na.rm=TRUE) # -6.9%
+qnorm(0.01,mean=mean(dji_daily_returns,na.rm=TRUE),sd=sd(dji_daily_returns,na.rm=TRUE)) #-0.03 = -3%
+qnorm(0.01,mean=mean(sp500_daily_returns,na.rm=TRUE),sd=sd(sp500_daily_returns,na.rm=TRUE)) # -0.03 = -3%
+qnorm(0.01,mean=mean(mrna_daily_returns,na.rm=TRUE),sd=sd(mrna_daily_returns,na.rm=TRUE)) # -0.11 = -11%
+qnorm(0.01,mean=mean(nflx_daily_returns,na.rm=TRUE),sd=sd(nflx_daily_returns,na.rm=TRUE)) # -0.06 = -6%
+# pretty close to the normal assumption
 
-# monthly VaR
-quantile(dji_monthly_returns,probs=0.01,na.rm=TRUE)
-quantile(sp500_monthly_returns,probs=0.01,na.rm=TRUE)
-quantile(mrna_monthly_returns,probs=0.01,na.rm=TRUE)
-quantile(nflx_monthly_returns,probs=0.01,na.rm=TRUE)
+# monthly VaR at 1%
+quantile(dji_monthly_returns,probs=0.01,na.rm=TRUE) # -11.2%
+quantile(sp500_monthly_returns,probs=0.01,na.rm=TRUE) # -10.4%
+quantile(mrna_monthly_returns,probs=0.01,na.rm=TRUE) # -33.9%
+quantile(nflx_monthly_returns,probs=0.01,na.rm=TRUE) # -35.5%
+qnorm(0.01,mean=mean(dji_monthly_returns,na.rm=TRUE),sd=sd(dji_monthly_returns,na.rm=TRUE)) # -0.109 = -10.9%
+qnorm(0.01,mean=mean(sp500_monthly_returns,na.rm=TRUE),sd=sd(sp500_monthly_returns,na.rm=TRUE)) # -0.106 = -10.6%
+qnorm(0.01,mean=mean(mrna_monthly_returns,na.rm=TRUE),sd=sd(mrna_monthly_returns,na.rm=TRUE)) # -0.555 = -55.5%
+qnorm(0.01,mean=mean(nflx_monthly_returns,na.rm=TRUE),sd=sd(nflx_monthly_returns,na.rm=TRUE)) # -0.245 = -24.5%
+# for the indices, the true quantiles are fairly close to the normal, however MRNA and NFLX are off by a large margin from the normal
 
 # ------------------------ Question 2: T Testing --------------------------
