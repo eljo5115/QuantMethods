@@ -99,7 +99,7 @@ for(i in 1:num_samps){
   sample_means[i] <- mean(sample(sp500_daily_returns,50,replace=TRUE))
 }
 # plot sampling distribution
-hist(sample_means,main="Histogram of Sampling Distribution")
+hist(sample_means,main="Histogram of Sampling Distribution",xlab="Sample Means (x)",ylab="Distribution")
 abline(v=mean(sample_means,na.rm=TRUE),col="blue",lty=2)
 
 # --------------------- our 5 year returns is the sample ---------------------
@@ -108,15 +108,17 @@ abline(v=mean(sample_means,na.rm=TRUE),col="blue",lty=2)
 sample_mean = mean(sp500_daily_returns,na.rm=TRUE) # 0.000058
 sample_geo_mean = prod(sp500_daily_returns+1,na.rm=TRUE)^(1/length(sp500_daily_returns)) # 1.000491
 sample_sd = sd(sp500_daily_returns,na.rm=TRUE) # 0.01334
+standard_error = sample_sd/sqrt(length(sp500_daily_returns)) # 3.5e-4
+
 
 hist(sp500_daily_returns,main="Histogram of Sample",breaks=100)
 abline(v=sample_mean,col="blue",lty=2)
 
-curve(dnorm(x,mean=sample_mean,sd=sample_sd),
+curve(dnorm(x,mean=sample_mean,sd=standard_error),
 col="red",
 lwd=2,
 add=FALSE,
-xlim=c(-0.04,0.04)
+xlim=c(-0.001,0.002)
 ,main="Sample Distribution Plot",
 xlab="Returns",
 ylab="Density"
@@ -130,13 +132,15 @@ abline(v=sample_mean,col="blue",lty=2)
 # but for good measure, and good practice I did both
 
 # -------------------- Plot our H0: mu = 0 ---------------------
-curve(dnorm(x,mean=0,sd=1),
+# normal curve under our assumption that mu = 0 
+curve(dnorm(x,mean=0,sd=standard_error),
 col="red",
 lwd=2,
 add=FALSE,
-xlim=c(-4,4),
+xlim=c(-0.002,0.002),
 main ="Null Hypothesis Plot",
 xlab="Returns",
 ylab="Density")
 
+# vert line for our sample mean
 abline(v=sample_mean,col="blue",lty=2)
