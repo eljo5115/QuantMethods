@@ -80,3 +80,63 @@ qnorm(0.01,mean=mean(nflx_monthly_returns,na.rm=TRUE),sd=sd(nflx_monthly_returns
 # for the indices, the true quantiles are fairly close to the normal, however MRNA and NFLX are off by a large margin from the normal
 
 # ------------------------ Question 2: T Testing --------------------------
+
+# 2 sample t-test Ha: mean_sp500 - mean_djia = 0
+#using as.vector as it is a single column data frame
+t.test(as.vector(sp500_daily_returns),as.vector(dji_daily_returns),paired=TRUE) 
+# p-value 0.1175, fail to reject H0, mean diff = 0.000175
+
+# 1 sample t test with H0: mu = 0
+t.test(as.vector(sp500_daily_returns))
+# p-value 0.0968, fail to reject null hypothesis
+
+# ------------------- sampling distribution of our 'population' ----------------
+# the population is our returns over the 5 years
+num_samps <- 5000
+sample_means <- rep(NA,num_samps)
+for(i in 1:num_samps){
+  # sample means for each 50 unit sample
+  sample_means[i] <- mean(sample(sp500_daily_returns,50,replace=TRUE))
+}
+# plot sampling distribution
+hist(sample_means,main="Histogram of Sampling Distribution")
+abline(v=mean(sample_means,na.rm=TRUE),col="blue",lty=2)
+
+# --------------------- our 5 year returns is the sample ---------------------
+# the assumed sampling distribution from our sample of returns from 5 years
+#NOTE: this is the arithmetic mean, not appropriate for returns
+sample_mean = mean(sp500_daily_returns,na.rm=TRUE) # 0.000058
+sample_geo_mean = prod(sp500_daily_returns+1,na.rm=TRUE)^(1/length(sp500_daily_returns)) # 1.000491
+sample_sd = sd(sp500_daily_returns,na.rm=TRUE) # 0.01334
+
+hist(sp500_daily_returns,main="Histogram of Sample",breaks=100)
+abline(v=sample_mean,col="blue",lty=2)
+
+curve(dnorm(x,mean=sample_mean,sd=sample_sd),
+col="red",
+lwd=2,
+add=FALSE,
+xlim=c(-0.04,0.04)
+,main="Sample Distribution Plot",
+xlab="Returns",
+ylab="Density"
+)
+
+abline(v=sample_mean,col="blue",lty=2)
+
+# I wasn't sure if you were calling our 5 years of returns the sample
+# (therefore all returns >5 years old and future returns the population)
+# or the returns over the past 5 years the population (therefore sample(sp500,50)) is the sample
+# but for good measure, and good practice I did both
+
+# -------------------- Plot our H0: mu = 0 ---------------------
+curve(dnorm(x,mean=0,sd=1),
+col="red",
+lwd=2,
+add=FALSE,
+xlim=c(-4,4),
+main ="Null Hypothesis Plot",
+xlab="Returns",
+ylab="Density")
+
+abline(v=sample_mean,col="blue",lty=2)
