@@ -144,3 +144,5 @@ ylab="Density")
 
 # vert line for our sample mean
 abline(v=sample_mean,col="blue",lty=2)
+
+
