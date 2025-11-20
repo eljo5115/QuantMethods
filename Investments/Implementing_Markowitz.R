@@ -11,12 +11,12 @@ if(!require(quantmod)){
 library(quantmod)
 
 # stocks we are Markowitzing
-stocksToAnalyze <- c("^GSPC","MMM","A","SLV")
+stocksToAnalyze <- c("SPY","MMM","A","SLV")
 # get monthly data, periodicity=monthly
 getSymbols(stocksToAnalyze, src="yahoo",from=as.Date("2002-01-01"),to=Sys.Date(),periodicity="monthly")
 
 # create returns dataframes from adjusted prices
-gspc <- as.data.frame(Delt(GSPC$GSPC.Adjusted,k=1))
+gspc <- as.data.frame(Delt(SPY$SPY.Adjusted,k=1))
 mmm <- as.data.frame(Delt(MMM$MMM.Adjusted,k=1))
 a <- as.data.frame(Delt(A$A.Adjusted,k=1))
 slv <- as.data.frame(Delt(SLV$SLV.Adjusted,k=1))
