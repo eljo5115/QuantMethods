@@ -7,6 +7,14 @@
 ## --------- ##
 ## Part 1: Construct the data set used for the first scatterplot.   
 ## --------- ##
+if(!require("quantmod")){
+     install.packages("quantmod")
+}
+if(!require("ggplot2")){
+     install.packages("ggplot2")
+}
+
+library(ggplot2) # for pretty, readable graphs
 
 library(quantmod) ## We have to load this library every time we use quantmod(). 
 getSymbols("UNRATE", src = "FRED") ## Here is unemployment data from FRED.  We have to convert this to quarterly. 
@@ -36,14 +44,38 @@ dat <- merge(unemp, spend, by ="Date", all = TRUE) ## I am keeping all of the da
 
 ## Now, I am creating a dataset that is only from Q1 1990 to Q3 2010.  This is for Taylor's scatterplot. 
 
-dat_1 <- dat[dat$Date >= as.Date("1990-01-01") & 
+taylor_dat <- dat[dat$Date >= as.Date("1990-01-01") & 
                          dat$Date <= as.Date("2010-07-01"), ]
 
 ## Here is Taylor's scatterplot!! It looks pretty consistent. 
-plot(UNRATE~GOV, data = dat_1, xlab = "Government Purchases as a Percent of GDP", 
+plot(UNRATE~GOV, data = taylor_dat, xlab = "Government Purchases as a Percent of GDP", 
      ylab = "Unemployment Rate", xlim = c(17, 22), ylim = c(3,11), col = "blue", pch = 16)
 
 
 ## --------- ##
 ## Part 3: Compare the scatter plot you obtain using the full data set to the one that Taylor reports.
 ## --------- ##
+dat$pre_taylor <- as.numeric(dat$Date < as.Date("1990-01-01"))
+dat$post_taylor <- as.numeric(dat$Date > as.Date("2010-07-01")) /0.5 # create 2 for post_taylor
+
+dat$is_not_taylor <- dat$pre_taylor + dat$post_taylor #0 is taylor, 1 is pre-taylor, 2 is post-taylor
+
+## Here is the scatterplot of the full data set. Colored according to above
+
+ggplot(data=dat,mapping=aes(x=GOV, y=UNRATE, color=factor(is_not_taylor))) +
+     geom_point(na.rm=TRUE) +
+     scale_color_manual(
+          name = "Is Taylor", # Title for the legend
+          values = c("red","blue","green"),
+          labels = c("Taylor", "Pre-Taylor","Post-Taylor")
+     )+
+     xlab("Government Purchases as a Percent of GDP") +
+     ylab("Unemployment Rate") +
+     geom_abline(intercept=coef(lm(UNRATE~GOV, data=dat[dat$is_not_taylor==0,]))[1],slope=coef(lm(UNRATE~GOV, data=dat[dat$is_not_taylor==0,]))[2], color="red", linetype="dashed") +
+     geom_abline(intercept=coef(lm(UNRATE~GOV, data=dat[dat$is_not_taylor==1,]))[1],slope=coef(lm(UNRATE~GOV, data=dat[dat$is_not_taylor==1,]))[2],color="blue", linetype="dashed") +
+     geom_abline(intercept=coef(lm(UNRATE~GOV, data=dat[dat$is_not_taylor==2,]))[1],slope=coef(lm(UNRATE~GOV, data=dat[dat$is_not_taylor==2,]))[2], color="green", linetype="dashed")
+
+
+cor(UNRATE~GOV, data=dat[dat$is_not_taylor==0])
+summary(mylm)
+
